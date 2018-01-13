@@ -43,13 +43,15 @@ public class OrderService {
 	}
 
 	public Receipt pay(Long id, BigDecimal payment) throws InvalidOrderException {
-		Order order = orderRepository.findOne(id);
-		if (order == null) {
+		Order originalOrder = orderRepository.findOne(id);
+		if (originalOrder == null) {
 			throw new InvalidOrderException("Could not find order corresponding to order id " + id);
 		}
+		originalOrder.setPaid(true);
+		Order updatedOrder = orderRepository.save(originalOrder);
 		Receipt receipt = new Receipt();
 		receipt.setPayment(payment);
-		receipt.setOrder(order);
+		receipt.setOrder(updatedOrder);
 		return receipt;
 	}
 }

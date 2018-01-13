@@ -1,12 +1,15 @@
 package answer.king.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -38,6 +41,7 @@ public class OrderServiceTest {
 		Order returnOrder = new Order();
 		returnOrder.setId(existingOrderId);
 		when(orderRepository.findOne(existingOrderId)).thenReturn(returnOrder);
+		when(orderRepository.save(any(Order.class))).thenReturn(returnOrder);
 		
 		//	when pay is called
 		Receipt receipt = orderService.pay(existingOrderId, payment);
@@ -55,11 +59,37 @@ public class OrderServiceTest {
 		BigDecimal payment = new BigDecimal(67.18);
 		
 		// set mock behaviour
-		when(orderRepository.findOne(nonExistingOrderId)).thenReturn(null);	
+		when(orderRepository.findOne(nonExistingOrderId)).thenReturn(null);
 		
 		//	when pay is called
 		orderService.pay(nonExistingOrderId, payment);
 		
 		//	then an InvalidOrderException exception is thrown
+	}
+	
+	@Test
+	public void when_order_is_paid_it_is_marked_as_paid() throws Throwable {
+
+		ArgumentCaptor<Order> orderCaptor = ArgumentCaptor.forClass(Order.class);
+		
+		//	given an existing order id and a payment amount
+		Long existingOrderId = 12L;
+		BigDecimal payment = new BigDecimal(89.18);
+
+		// set mock behaviour
+		Order returnOrder = new Order();
+		returnOrder.setId(existingOrderId);
+		when(orderRepository.findOne(existingOrderId)).thenReturn(returnOrder);
+		when(orderRepository.save(orderCaptor.capture())).thenReturn(returnOrder);
+		
+		//	when pay is called
+		Receipt receipt = orderService.pay(existingOrderId, payment);
+		
+		//	then the order, marked as paid, is saved to the order repository
+		assertEquals(existingOrderId, orderCaptor.getValue().getId());
+		assertTrue(orderCaptor.getValue().getPaid());
+		
+		//	and the receipt contains the corresponding order which is marked as paid
+		assertTrue(receipt.getOrder().getPaid());
 	}
 }
