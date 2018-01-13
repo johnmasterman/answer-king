@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.junit.Test;
 
 import answer.king.model.Item;
+import answer.king.model.exception.InvalidItemException;
 
 /**
  * Item is 

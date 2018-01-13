@@ -3,6 +3,7 @@ package answer.king.validator;
 import java.math.BigDecimal;
 import org.springframework.stereotype.Component;
 import answer.king.model.Item;
+import answer.king.model.exception.InvalidItemException;
 
 /**
  * Item is invalid when 

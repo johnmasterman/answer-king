@@ -1,4 +1,4 @@
-package answer.king.validator;
+package answer.king.model.exception;
 
 /**
  * Indicates that an item is invalid.

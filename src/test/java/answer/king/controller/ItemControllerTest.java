@@ -72,7 +72,7 @@ public class ItemControllerTest {
     @Test 
     public void posting_item_returns_item() throws Throwable {
     	
-    	//    	given an item
+    	// given an item
     	Item item = new Item();
     	item.setId(1L);
     	item.setName("itemName");

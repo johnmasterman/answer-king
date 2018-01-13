@@ -1,9 +1,14 @@
 package answer.king.controller;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import answer.king.model.Order;
 import answer.king.model.Receipt;
+import answer.king.model.exception.InvalidOrderException;
 import answer.king.service.OrderService;
 
 @RestController
@@ -37,7 +43,13 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/{id}/pay", method = RequestMethod.PUT)
-	public Receipt pay(@PathVariable("id") Long id, @RequestBody BigDecimal payment) {
+	public Receipt pay(@PathVariable("id") Long id, @RequestBody BigDecimal payment) throws InvalidOrderException {
 		return orderService.pay(id, payment);
+	}
+	
+	//	Ensures that a 400 bad request response is sent if an invalid order exception is thrown
+	@ExceptionHandler({InvalidOrderException.class})
+	void handleBadRequests(HttpServletResponse response) throws IOException {
+	    response.sendError(HttpStatus.BAD_REQUEST.value());
 	}
 }

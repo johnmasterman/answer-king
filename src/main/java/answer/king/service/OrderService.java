@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import answer.king.model.Item;
 import answer.king.model.Order;
 import answer.king.model.Receipt;
+import answer.king.model.exception.InvalidOrderException;
 import answer.king.repo.ItemRepository;
 import answer.king.repo.OrderRepository;
 
@@ -41,9 +42,11 @@ public class OrderService {
 		orderRepository.save(order);
 	}
 
-	public Receipt pay(Long id, BigDecimal payment) {
+	public Receipt pay(Long id, BigDecimal payment) throws InvalidOrderException {
 		Order order = orderRepository.findOne(id);
-
+		if (order == null) {
+			throw new InvalidOrderException("Could not find order corresponding to order id " + id);
+		}
 		Receipt receipt = new Receipt();
 		receipt.setPayment(payment);
 		receipt.setOrder(order);
