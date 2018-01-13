@@ -115,4 +115,20 @@ public class ItemControllerTest {
     	assertEquals(item.getName(), itemCaptor.getValue().getName());
     	assertEquals(item.getPrice(), itemCaptor.getValue().getPrice());
     }
+    
+    @Test
+    public void posting_invalid_item_returns_bad_request() throws Throwable {
+
+    	//	given an item that is invalid due to having no name
+    	Item item = new Item();
+    	item.setPrice(new BigDecimal(45));
+    	ObjectMapper mapper = new ObjectMapper();    	
+    	
+    	//	when the item is posted to the create item endpoint
+    	mvc.perform(post("/item").content(mapper.writeValueAsString(item))
+		.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+    	
+    	//	then a bad request status code is returned
+    		.andExpect(status().isBadRequest());
+    }
 }
