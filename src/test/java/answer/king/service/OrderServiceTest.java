@@ -6,6 +6,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import answer.king.model.Item;
 import answer.king.model.Order;
 import answer.king.model.Receipt;
 import answer.king.model.exception.InvalidOrderException;
@@ -91,5 +94,30 @@ public class OrderServiceTest {
 		
 		//	and the receipt contains the corresponding order which is marked as paid
 		assertTrue(receipt.getOrder().getPaid());
+	}
+	
+	@Test(expected=InvalidOrderException.class) 
+	public void when_insufficient_payment_is_offered_exception_thrown() throws Throwable {
+
+		//	given an existing order id whose order contains items whose prices sum to more than the payment amount
+		Long existingOrderId = 17L;
+		BigDecimal payment = new BigDecimal(20);
+		Order order = new Order();
+		List<Item> items = new ArrayList<>();
+		Item itemOne = new Item();
+		itemOne.setPrice(new BigDecimal(12));
+		items.add(itemOne);
+		Item itemTwo = new Item();
+		itemTwo.setPrice(new BigDecimal(9));
+		items.add(itemTwo);
+		order.setItems(items);
+		
+		//	set mock behaviour
+		when(orderRepository.findOne(existingOrderId)).thenReturn(order);
+		
+		//	when pay is called
+		orderService.pay(existingOrderId, payment);
+		
+		//	then an InvalidOrderException exception is thrown
 	}
 }

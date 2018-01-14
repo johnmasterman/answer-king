@@ -13,6 +13,7 @@ import answer.king.model.Receipt;
 import answer.king.model.exception.InvalidOrderException;
 import answer.king.repo.ItemRepository;
 import answer.king.repo.OrderRepository;
+import answer.king.validator.OrderValidator;
 
 @Service
 @Transactional
@@ -23,6 +24,8 @@ public class OrderService {
 
 	@Autowired
 	private ItemRepository itemRepository;
+	
+	private OrderValidator orderValidator = new OrderValidator();
 
 	public List<Order> getAll() {
 		return orderRepository.findAll();
@@ -47,6 +50,7 @@ public class OrderService {
 		if (originalOrder == null) {
 			throw new InvalidOrderException("Could not find order corresponding to order id " + id);
 		}
+		orderValidator.validate(originalOrder, payment);
 		originalOrder.setPaid(true);
 		Order updatedOrder = orderRepository.save(originalOrder);
 		Receipt receipt = new Receipt();
