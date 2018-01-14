@@ -25,6 +25,9 @@ public class OrderService {
 	@Autowired
 	private ItemRepository itemRepository;
 	
+	@Autowired
+	ReceiptService receiptService;
+	
 	private OrderValidator orderValidator = new OrderValidator();
 
 	public List<Order> getAll() {
@@ -56,6 +59,6 @@ public class OrderService {
 		Receipt receipt = new Receipt();
 		receipt.setPayment(payment);
 		receipt.setOrder(updatedOrder);
-		return receipt;
+		return receiptService.save(receipt);
 	}
 }

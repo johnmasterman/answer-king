@@ -12,6 +12,8 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,6 +24,7 @@ import answer.king.model.Order;
 import answer.king.model.Receipt;
 import answer.king.model.exception.InvalidOrderException;
 import answer.king.repo.OrderRepository;
+import answer.king.repo.ReceiptRepository;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -32,10 +35,13 @@ public class OrderServiceTest {
 	
 	@MockBean
 	private OrderRepository orderRepository;
+	
+	@MockBean
+	private ReceiptRepository receiptRepository;
     
 	@Test
 	public void valid_order_id_and_payment_gets_valid_receipt() throws Throwable {
-	
+
 		//	given an existing order id and a payment amount
 		Long existingOrderId = 8L;
 		BigDecimal payment = new BigDecimal(67.18);
@@ -45,6 +51,13 @@ public class OrderServiceTest {
 		returnOrder.setId(existingOrderId);
 		when(orderRepository.findOne(existingOrderId)).thenReturn(returnOrder);
 		when(orderRepository.save(any(Order.class))).thenReturn(returnOrder);
+		
+		when(receiptRepository.save(any(Receipt.class))).thenAnswer(
+            new Answer<Receipt>(){
+            @Override
+            public Receipt answer(InvocationOnMock invocation){
+                return invocation.getArgumentAt(0, Receipt.class);
+            }});
 		
 		//	when pay is called
 		Receipt receipt = orderService.pay(existingOrderId, payment);
@@ -84,6 +97,14 @@ public class OrderServiceTest {
 		returnOrder.setId(existingOrderId);
 		when(orderRepository.findOne(existingOrderId)).thenReturn(returnOrder);
 		when(orderRepository.save(orderCaptor.capture())).thenReturn(returnOrder);
+		
+		when(receiptRepository.save(any(Receipt.class))).thenAnswer(
+            new Answer<Receipt>(){
+            @Override
+            public Receipt answer(InvocationOnMock invocation){
+                return invocation.getArgumentAt(0, Receipt.class);
+            }});
+			
 		
 		//	when pay is called
 		Receipt receipt = orderService.pay(existingOrderId, payment);
