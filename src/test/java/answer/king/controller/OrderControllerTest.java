@@ -2,7 +2,10 @@ package answer.king.controller;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -51,7 +54,7 @@ public class OrderControllerTest {
     	receipt.setPayment(payment);
     	Order order = new Order();
     	order.setId(orderId);
-    	order.setItems(Collections.emptyList());
+    	order.setLineItems(Collections.emptyList());
     	receipt.setOrder(order);
     	when(orderService.pay(orderId, payment)).thenReturn(receipt);
     	
@@ -80,7 +83,7 @@ public class OrderControllerTest {
     	receipt.setPayment(payment);
     	Order order = new Order();
     	order.setId(orderId);
-    	order.setItems(Collections.emptyList());
+    	order.setLineItems(Collections.emptyList());
     	receipt.setOrder(order);
     	when(orderService.pay(orderIdCaptor.capture(), paymentCaptor.capture())).thenReturn(receipt);
     	
@@ -109,5 +112,42 @@ public class OrderControllerTest {
     	
     	//	then a bad request status code is returned
     		.andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    public void create_order_with_no_items_creates_new_order() throws Throwable{
+ 
+    	//	set mock behaviour
+    	Order order = new Order();
+    	when(orderService.save(any(Order.class))).thenReturn(order);
+    	
+    	//	when post is called on the order endpoint 
+    	mvc.perform(post("/order").accept(MediaType.APPLICATION_JSON))
+    	
+    	//	then an order is returned
+    		.andExpect(status().isOk())
+    		.andExpect(jsonPath("$.id", is(order.getId())));
+    }
+    
+    @Test
+    public void add_item_to_existing_order_calls_item_service_add_item() throws Throwable {
+    	
+    	ArgumentCaptor<Long> orderIdCaptor = ArgumentCaptor.forClass(Long.class);
+    	ArgumentCaptor<Long> itemIdCaptor = ArgumentCaptor.forClass(Long.class);
+    	
+    	//	given an existing order with no items
+    	Long existingOrderId = new Long(2);
+    	Long itemId = new Long(79);
+    	
+    	//	set mocks  	
+    	doNothing().when(orderService).addItem(orderIdCaptor.capture(), itemIdCaptor.capture());
+    	
+    	//	when an item is added to the order
+    	mvc.perform(put("/order/" + existingOrderId + "/addItem/" + itemId)
+            .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
+    	
+    	//	then the item service is called with the order id and the item id
+    	assertEquals(existingOrderId, orderIdCaptor.getValue());
+    	assertEquals(itemId, itemIdCaptor.getValue());
     }
 }

@@ -20,9 +20,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import answer.king.model.Item;
+import answer.king.model.LineItem;
 import answer.king.model.Order;
 import answer.king.model.Receipt;
 import answer.king.model.exception.InvalidOrderException;
+import answer.king.repo.ItemRepository;
 import answer.king.repo.OrderRepository;
 import answer.king.repo.ReceiptRepository;
 
@@ -35,6 +37,9 @@ public class OrderServiceTest {
 	
 	@MockBean
 	private OrderRepository orderRepository;
+	
+	@MockBean
+	private ItemRepository itemRepository;
 	
 	@MockBean
 	private ReceiptRepository receiptRepository;
@@ -124,14 +129,14 @@ public class OrderServiceTest {
 		Long existingOrderId = 17L;
 		BigDecimal payment = new BigDecimal(20);
 		Order order = new Order();
-		List<Item> items = new ArrayList<>();
-		Item itemOne = new Item();
+		List<LineItem> lineItems = new ArrayList<>();
+		LineItem itemOne = new LineItem();
 		itemOne.setPrice(new BigDecimal(12));
-		items.add(itemOne);
-		Item itemTwo = new Item();
+		lineItems.add(itemOne);
+		LineItem itemTwo = new LineItem();
 		itemTwo.setPrice(new BigDecimal(9));
-		items.add(itemTwo);
-		order.setItems(items);
+		lineItems.add(itemTwo);
+		order.setLineItems(lineItems);
 		
 		//	set mock behaviour
 		when(orderRepository.findOne(existingOrderId)).thenReturn(order);
@@ -140,5 +145,38 @@ public class OrderServiceTest {
 		orderService.pay(existingOrderId, payment);
 		
 		//	then an InvalidOrderException exception is thrown
+	}
+	
+	@Test
+	public void line_item_added_to_existing_order_when_add_item_called() {
+		
+		ArgumentCaptor<Order> orderCaptor = ArgumentCaptor.forClass(Order.class);
+		
+		//	given an existing order id, and item id whose item price is known
+		Long orderId = 17L;
+		Long itemId = 21L;
+		BigDecimal itemPrice = new BigDecimal(94.70);
+		
+		//	setup mocks
+		Order order = new Order();
+		order.setId(orderId);
+		Item item = new Item();
+		item.setId(itemId);
+		item.setName("itemName");
+		item.setPrice(itemPrice);
+		when(orderRepository.findOne(orderId)).thenReturn(order);
+		when(itemRepository.findOne(itemId)).thenReturn(item);
+		when(orderRepository.save(orderCaptor.capture())).thenReturn(null);	//	Don't care what is returned
+		
+		//	when add item is called
+		orderService.addItem(orderId, itemId);
+				
+		//	then a line item is created which is persisted when the order is persisted
+		Order savedOrder = orderCaptor.getValue();
+		assertEquals(orderId, savedOrder.getId());
+		LineItem lineItem = savedOrder.getLineItems().get(0);
+		assertEquals(itemId, lineItem.getItem().getId());
+		assertEquals(itemPrice, lineItem.getPrice());
+		assertEquals("itemName", lineItem.getItem().getName());
 	}
 }

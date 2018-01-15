@@ -1,6 +1,7 @@
 package answer.king.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import answer.king.model.Item;
+import answer.king.model.LineItem;
 import answer.king.model.Order;
 import answer.king.model.Receipt;
 import answer.king.model.exception.InvalidOrderException;
@@ -38,12 +40,16 @@ public class OrderService {
 		return orderRepository.save(order);
 	}
 
-	public void addItem(Long id, Long itemId) {
-		Order order = orderRepository.findOne(id);
+	public void addItem(Long orderId, Long itemId) {
+		Order order = orderRepository.findOne(orderId);
 		Item item = itemRepository.findOne(itemId);
+		LineItem lineItem = new LineItem(item.getPrice(), item);
 
-		item.setOrder(order);
-		order.getItems().add(item);
+		if (order.getLineItems() == null)
+		{
+			order.setLineItems(new ArrayList<>());
+		}
+		order.getLineItems().add(lineItem);
 
 		orderRepository.save(order);
 	}

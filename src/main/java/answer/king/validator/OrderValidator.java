@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-import answer.king.model.Item;
+import answer.king.model.LineItem;
 import answer.king.model.Order;
 import answer.king.model.exception.InvalidOrderException;
 
@@ -21,12 +21,12 @@ public class OrderValidator {
 	
 	private BigDecimal calculateOrderCost(Order order) {
 	
-		List<Item> items = order.getItems();
-		if (items == null) {
+		List<LineItem> lineItems = order.getLineItems();
+		if (lineItems == null) {
 			return BigDecimal.ZERO;
 		} else {
-			Function<Item, BigDecimal> itemToPrice = item -> item.getPrice();
-			return order.getItems().stream().map(itemToPrice).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+			Function<LineItem, BigDecimal> lineItemToPrice = lineItem -> lineItem.getPrice();
+			return lineItems.stream().map(lineItemToPrice).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
 		}
 	}
 }

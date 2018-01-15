@@ -50,11 +50,48 @@ public class Receipt {
 	}
 
 	public BigDecimal getChange() {
-		BigDecimal totalOrderPrice = order.getItems()
+		BigDecimal totalOrderPrice = order.getLineItems()
 			.stream()
-			.map(Item::getPrice)
+			.map(LineItem::getPrice)
 			.reduce(BigDecimal.ZERO, BigDecimal::add);
 
 		return payment.subtract(totalOrderPrice);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((order == null) ? 0 : order.hashCode());
+		result = prime * result + ((payment == null) ? 0 : payment.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Receipt other = (Receipt) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (order == null) {
+			if (other.order != null)
+				return false;
+		} else if (!order.equals(other.order))
+			return false;
+		if (payment == null) {
+			if (other.payment != null)
+				return false;
+		} else if (!payment.equals(other.payment))
+			return false;
+		return true;
 	}
 }
