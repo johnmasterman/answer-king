@@ -44,6 +44,7 @@ public class OrderService {
 		Order order = orderRepository.findOne(orderId);
 		Item item = itemRepository.findOne(itemId);
 		LineItem lineItem = new LineItem(item.getPrice(), item, quantity);
+		lineItem.setOrder(order);
 
 		List<LineItem> lineItems = order.getLineItems();
 		if (lineItems == null)

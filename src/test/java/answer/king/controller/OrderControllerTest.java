@@ -130,7 +130,7 @@ public class OrderControllerTest {
     }
     
     @Test
-    public void add_item_to_existing_order_calls_item_service_add_item() throws Throwable {
+    public void add_item_to_existing_order_calls_order_service_add_item() throws Throwable {
     	
     	ArgumentCaptor<Long> orderIdCaptor = ArgumentCaptor.forClass(Long.class);
     	ArgumentCaptor<Long> itemIdCaptor = ArgumentCaptor.forClass(Long.class);
