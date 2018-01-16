@@ -37,9 +37,9 @@ public class OrderController {
 		return orderService.save(new Order());
 	}
 
-	@RequestMapping(value = "/{id}/addItem/{itemId}", method = RequestMethod.PUT)
-	public void addItem(@PathVariable("id") Long id, @PathVariable("itemId") Long itemId) {
-		orderService.addItem(id, itemId);
+	@RequestMapping(value = "/{id}/addItem/{itemId}/{quantity}", method = RequestMethod.PUT)
+	public void addItem(@PathVariable("id") Long id, @PathVariable("itemId") Long itemId,  @PathVariable("quantity") int quantity) {
+		orderService.addItem(id, itemId, quantity);
 	}
 
 	@RequestMapping(value = "/{id}/pay", method = RequestMethod.PUT)

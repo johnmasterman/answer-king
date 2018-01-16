@@ -24,7 +24,7 @@ public class LineItem {
 	
 	private BigDecimal price;
 	
-	private final int quantity = 1;
+	private int quantity;
 	
 	@JsonIgnore
 	@OneToOne(fetch = FetchType.LAZY)
@@ -37,12 +37,13 @@ public class LineItem {
 	private Order order;
 	
 	public LineItem() {
-		this(BigDecimal.ZERO, null);
+		this(BigDecimal.ZERO, null, 0);
 	}
 
-	public LineItem(BigDecimal price, Item item) {
+	public LineItem(BigDecimal price, Item item, int quantity) {
 		this.price = price;
 		this.item = item;
+		this.quantity = quantity;
 	}
 	
 	public Long getId() {
@@ -63,6 +64,10 @@ public class LineItem {
 
 	public int getQuantity() {
 		return quantity;
+	}
+	
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
 	}
 
 	public Item getItem() {

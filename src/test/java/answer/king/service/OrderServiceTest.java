@@ -169,7 +169,7 @@ public class OrderServiceTest {
 		when(orderRepository.save(orderCaptor.capture())).thenReturn(null);	//	Don't care what is returned
 		
 		//	when add item is called
-		orderService.addItem(orderId, itemId);
+		orderService.addItem(orderId, itemId, 1);
 				
 		//	then a line item is created which is persisted when the order is persisted
 		Order savedOrder = orderCaptor.getValue();
@@ -178,5 +178,94 @@ public class OrderServiceTest {
 		assertEquals(itemId, lineItem.getItem().getId());
 		assertEquals(itemPrice, lineItem.getPrice());
 		assertEquals("itemName", lineItem.getItem().getName());
+	}
+	
+	@Test
+	public void item_added_to_order_with_quantity_two_saves_order_with_two_items() {
+		
+		ArgumentCaptor<Order> orderCaptor = ArgumentCaptor.forClass(Order.class);
+		
+		//	given an existing order id, and item id 
+		Long orderId = 37L;
+		Long itemId = 28L;
+		BigDecimal itemPrice = new BigDecimal(10.99);
+		String itemName = "Banana";
+		
+		//	setup mocks
+		Order order = new Order();
+		order.setId(orderId);
+		Item item = new Item();
+		item.setId(itemId);
+		item.setName(itemName);
+		item.setPrice(itemPrice);
+		when(orderRepository.findOne(orderId)).thenReturn(order);
+		when(itemRepository.findOne(itemId)).thenReturn(item);
+		when(orderRepository.save(orderCaptor.capture())).thenReturn(null);	//	Don't care what is returned
+		
+		//	when the item is added to the order with a quantity of 2
+		orderService.addItem(orderId, itemId, 2);
+		
+		//	then the order is saved with a line item with quantity 2
+		//	then a line item is created which is persisted when the order is persisted
+		Order savedOrder = orderCaptor.getValue();
+		assertEquals(orderId, savedOrder.getId());
+		LineItem lineItem = savedOrder.getLineItems().get(0);
+		assertEquals(itemId, lineItem.getItem().getId());
+		assertEquals(itemPrice, lineItem.getPrice());
+		assertEquals(itemName, lineItem.getItem().getName());
+		assertEquals(2, lineItem.getQuantity());
+	}
+	
+	@Test
+	public void two_bananas_added_to_order_which_has_3_bananas_and_2_apples_sums_bananas() {
+	
+		ArgumentCaptor<Order> orderCaptor = ArgumentCaptor.forClass(Order.class);
+		
+		//	given an existing order with 3 bananas and 2 apples
+		Long orderId = new Long(5382046);
+	
+		Long bananaId = new Long(1);
+		String banana = "banana";
+		BigDecimal bananaPrice = new BigDecimal(0.15);
+		Item bananaItem = new Item();
+		bananaItem.setId(bananaId);
+		bananaItem.setName(banana);
+		LineItem bananaLineItem = new LineItem(bananaPrice, bananaItem, 3);
+		
+		Long appleId = new Long(2);
+		String apple = "apple";
+		BigDecimal applePrice = new BigDecimal(0.20);
+		Item appleItem = new Item();
+		appleItem.setId(appleId);
+		appleItem.setName(apple);
+		LineItem appleLineItem = new LineItem(applePrice, appleItem, 2);
+		
+		List<LineItem> fruitAlreadyOnOrder = new ArrayList<>();
+		fruitAlreadyOnOrder.add(bananaLineItem);
+		fruitAlreadyOnOrder.add(appleLineItem);
+		
+		Order order = new Order();
+		order.setLineItems(fruitAlreadyOnOrder);
+		
+		//	setup mocks
+		when(orderRepository.findOne(orderId)).thenReturn(order);
+		when(itemRepository.findOne(bananaId)).thenReturn(bananaItem);
+		when(orderRepository.save(orderCaptor.capture())).thenReturn(null);	//	Don't care what is returned
+		
+		//	when two bananas are added to order
+		orderService.addItem(orderId, bananaId, 2);
+		
+		//	then the order is for 5 bananas and 2 apples
+		Order savedOrder = orderCaptor.getValue();
+		List<LineItem> lineItems = savedOrder.getLineItems();
+		LineItem lineItemOne = lineItems.get(0);
+		LineItem lineItemTwo = lineItems.get(1);
+		LineItem capturedBananaLineItem = lineItemOne.getItem().getName().equals(banana) ? lineItemOne : lineItemTwo;
+		LineItem capturedAppleLineItem = lineItemOne.getItem().getName().equals(apple) ? lineItemOne : lineItemTwo;
+		
+		assertEquals(5, capturedBananaLineItem.getQuantity());
+		assertEquals(bananaPrice, capturedBananaLineItem.getPrice());
+		assertEquals(2, capturedAppleLineItem.getQuantity());
+		assertEquals(applePrice, capturedAppleLineItem.getPrice());
 	}
 }

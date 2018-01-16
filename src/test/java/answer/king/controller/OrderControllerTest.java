@@ -134,20 +134,23 @@ public class OrderControllerTest {
     	
     	ArgumentCaptor<Long> orderIdCaptor = ArgumentCaptor.forClass(Long.class);
     	ArgumentCaptor<Long> itemIdCaptor = ArgumentCaptor.forClass(Long.class);
+    	ArgumentCaptor<Integer> quantityCaptor = ArgumentCaptor.forClass(Integer.class);
     	
     	//	given an existing order with no items
     	Long existingOrderId = new Long(2);
     	Long itemId = new Long(79);
+    	int quantity = 6;
     	
     	//	set mocks  	
-    	doNothing().when(orderService).addItem(orderIdCaptor.capture(), itemIdCaptor.capture());
+    	doNothing().when(orderService).addItem(orderIdCaptor.capture(), itemIdCaptor.capture(), quantityCaptor.capture());
     	
     	//	when an item is added to the order
-    	mvc.perform(put("/order/" + existingOrderId + "/addItem/" + itemId)
+    	mvc.perform(put("/order/" + existingOrderId + "/addItem/" + itemId + "/" + quantity)
             .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
     	
     	//	then the item service is called with the order id and the item id
     	assertEquals(existingOrderId, orderIdCaptor.getValue());
     	assertEquals(itemId, itemIdCaptor.getValue());
+    	assertEquals(quantity, (int)quantityCaptor.getValue());
     }
 }

@@ -40,18 +40,38 @@ public class OrderService {
 		return orderRepository.save(order);
 	}
 
-	public void addItem(Long orderId, Long itemId) {
+	public void addItem(Long orderId, Long itemId, int quantity) {
 		Order order = orderRepository.findOne(orderId);
 		Item item = itemRepository.findOne(itemId);
-		LineItem lineItem = new LineItem(item.getPrice(), item);
+		LineItem lineItem = new LineItem(item.getPrice(), item, quantity);
 
-		if (order.getLineItems() == null)
+		List<LineItem> lineItems = order.getLineItems();
+		if (lineItems == null)
 		{
-			order.setLineItems(new ArrayList<>());
+			lineItems = new ArrayList<>();
+			order.setLineItems(lineItems);
 		}
-		order.getLineItems().add(lineItem);
+		
+		LineItem existingLineItemForItem = getExistingLineItemForItemIfExists(itemId, lineItems);
+		if (existingLineItemForItem == null) {
+			lineItems.add(lineItem);
+		} else {
+			int newQuantity = existingLineItemForItem.getQuantity() + quantity;
+			existingLineItemForItem.setQuantity(newQuantity);
+		}
+		
 
 		orderRepository.save(order);
+	}
+	
+	private LineItem getExistingLineItemForItemIfExists(Long itemId, List<LineItem> lineItems) {
+	
+		for (LineItem lineItem : lineItems) {
+			if (itemId.equals(lineItem.getItem().getId())) {
+				return lineItem;
+			}
+		}
+		return null;
 	}
 
 	public Receipt pay(Long id, BigDecimal payment) throws InvalidOrderException {
