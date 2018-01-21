@@ -9,8 +9,7 @@ function createItem() {
 
     var newItem = new Object();
     newItem.name = $('#newItemName').val();
-    newItem.price = $('#newItemPrice').val();
-    alert('createItem() called, newItem.name = ' + newItem.name + ', newItem.price = ' + newItem.price);
+    newItem.price = $('#newItemPrice').val();   
     
     $.ajax({
         url: "http://localhost:8888/item",
@@ -28,10 +27,23 @@ function createItem() {
             alert("error: " + data + " status: " + status + " er: " + er);
         }
     }); 
-   
 }
 
 //  Load all items into items table
 function loadItems() {
-    alert('Load items'); 
+    
+        $.getJSON("http://localhost:8888/item", function(data) {
+        
+        var table = '<table>';
+        table += '<tr><th>Name</th><th>Price</th></tr>'
+        
+        $.each( data, function( index, item) {
+           table += '<tr><td>' + item.name + '</td><td>' + item.price + '</td></tr>';       
+        });
+        
+        table += '</table>';
+        
+        $("#items").html( table );
+        
+    });
 }

@@ -4,6 +4,7 @@
   font-size: 18px;
 }
 
+
 label {
     display:block;
 }
@@ -18,34 +19,6 @@ button {
 
 .header {
     padding-top: 5px;
-}
-
-.leftArea {
-    position: absolute;
-    left: 10px;
-    top: 70px;
-    bottom: 20px;
-    width: 260px;
-    border:solid 1px #CCCCCC;
-    overflow-y: scroll;
-}
-
-.mainArea {
-    position: absolute;
-    top: 70px;
-    bottom: 20px;
-    left:300px;
-    overflow-y: scroll;
-    width:300px;
-}
-
-.rightArea {
-    position: absolute;
-    top: 70px;
-    bottom: 20px;
-    left:650px;
-    overflow-y: scroll;
-    width:270px;
 }
 
 ul {
@@ -84,11 +57,4 @@ textarea {
     margin-top:5px;
     height: 200px;
     width:250px;
-}
-
-
-
-
-#searchKey {
-    width:160px;
 }

@@ -34,7 +34,10 @@ public class ItemController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public List<Item> getAll() {
-		return itemService.getAll();
+		List<Item> items = itemService.getAll();
+		log.info("returning a list of " + items.size() + " items");
+		items.forEach(item -> log.info(item));
+		return items;
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
