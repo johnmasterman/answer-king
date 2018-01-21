@@ -104,4 +104,9 @@ public class Item {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "Item [id=" + id + ", name=" + name + ", price=" + price + "]";
+	}
 }

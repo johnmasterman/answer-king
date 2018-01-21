@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Items</title>
+    <script src="js/jquery-1.7.1.min.js"></script>
+    <script src="js/items.js"></script>
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+    
+</head>
+<body>
+    <h1>Answer King</h1>
+
+    <a href="../index.html">Home</a> <br>
+    <a href="index.html">Web view</a> <br>
+    <a href="orders.html">Orders</a> <br>
+    
+    <h3>Items</h3>
+    
+    <div>
+        <table id="items" class="table">
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+            </tr>
+        </table>
+    </div>
+    
+    <h3>Item</h3>
+    
+    <!-- New Item -->
+    <div>
+        <div class="input-and-label">
+            <span class="label">Name</span>
+            <input id="newItemName" name="newItemName" type="text">
+        </div>
+        <br/>
+        <div class="input-and-label">
+            <span class="label">Price (£)</span>
+            <input id="newItemPrice" name="newItemPrice" type="text">
+        </div>
+        <p>
+            <button type="button" onclick="createItem()">New Item</button>
+        </p>
+    </div>
+
+</body>
+</html>

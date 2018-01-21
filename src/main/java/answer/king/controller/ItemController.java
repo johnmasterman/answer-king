@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,6 +27,8 @@ public class ItemController {
 
 	private ItemValidator validator = new ItemValidator();
 	
+	private final Logger log = Logger.getLogger(getClass());
+	
 	@Autowired
 	private ItemService itemService;
 
@@ -37,6 +40,7 @@ public class ItemController {
 	@RequestMapping(method = RequestMethod.POST)
 	public Item create(@RequestBody Item item) throws InvalidItemException {
 		
+		log.info("Create called with item " + item);
 		validator.validate(item);
 		return itemService.save(item);
 	}
